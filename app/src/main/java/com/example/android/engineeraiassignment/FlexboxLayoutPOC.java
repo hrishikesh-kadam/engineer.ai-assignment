@@ -1,6 +1,7 @@
 package com.example.android.engineeraiassignment;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -35,7 +36,7 @@ public class FlexboxLayoutPOC extends AppCompatActivity {
         scrollView.addView(buildImageViewFlexboxLayout(this, 5));
     }
 
-    public FlexboxLayout buildImageViewFlexboxLayout(Context context, int noOfItems) {
+    public static FlexboxLayout buildImageViewFlexboxLayout(Context context, int noOfItems) {
 
         FlexboxLayout flexboxLayout = new FlexboxLayout(context);
 
@@ -49,18 +50,28 @@ public class FlexboxLayoutPOC extends AppCompatActivity {
         flexboxLayout.setAlignItems(AlignItems.FLEX_START);
         flexboxLayout.setFlexWrap(FlexWrap.WRAP);
 
-        boolean isOdd = noOfItems % 2 == 1;
+        int orientation = context.getResources().getConfiguration().orientation;
 
-        if (isOdd)
-            flexboxLayout.addView(getImageViewItem(context, ODD));
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-        for (int i = isOdd ? 2 : 1; i <= noOfItems; i++)
-            flexboxLayout.addView(getImageViewItem(context, EVEN));
+            boolean isOdd = noOfItems % 2 == 1;
+
+            if (isOdd)
+                flexboxLayout.addView(getImageViewItem(context, ODD));
+
+            for (int i = isOdd ? 2 : 1; i <= noOfItems; i++)
+                flexboxLayout.addView(getImageViewItem(context, EVEN));
+
+        } else {
+
+            for (int i = 1; i <= noOfItems; i++)
+                flexboxLayout.addView(getImageViewItem(context, EVEN));
+        }
 
         return flexboxLayout;
     }
 
-    public ImageView getImageViewItem(Context context, int type) {
+    public static ImageView getImageViewItem(Context context, int type) {
 
         ImageView imageView = new ImageView(context);
 
