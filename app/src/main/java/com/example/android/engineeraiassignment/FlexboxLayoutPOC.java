@@ -13,6 +13,7 @@ import android.widget.ScrollView;
 import com.google.android.flexbox.AlignItems;
 import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayout;
+import com.google.android.flexbox.JustifyContent;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +49,7 @@ public class FlexboxLayoutPOC extends AppCompatActivity {
                 0, 0, MainApplication.imageViewMarginInPixel, MainApplication.imageViewMarginInPixel);
 
         flexboxLayout.setAlignItems(AlignItems.FLEX_START);
+        flexboxLayout.setJustifyContent(JustifyContent.CENTER);
         flexboxLayout.setFlexWrap(FlexWrap.WRAP);
 
         int orientation = context.getResources().getConfiguration().orientation;
