@@ -25,13 +25,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int GET_USERS_CALL = 1;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
     private MockService mockService;
     private ArrayList<User> userArrayList;
     private boolean hasMore = true;
     private UsersAdapter usersAdapter;
-
-    @BindView(R.id.recyclerView)
-    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersAdapter = new UsersAdapter(this, UsersAdapter.LOADING_VIEW);
+        recyclerView.setAdapter(usersAdapter);
 
         Retrofit retrofit = RetrofitConfiguration.getRetrofit();
         mockService = retrofit.create(MockService.class);
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader onCreateLoader(int id, Bundle args) {
 
-        switch(id) {
+        switch (id) {
 
             case GET_USERS_CALL:
                 Log.v(LOG_TAG, "-> onCreateLoader -> GET_USERS_CALL");
@@ -67,13 +68,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader loader, Object data) {
 
-        switch(loader.getId()) {
+        switch (loader.getId()) {
 
             case GET_USERS_CALL:
 
-                if (data == null || !(((Response<UserBody>) data).isSuccessful()) ) {
+                if (data == null || !(((Response<UserBody>) data).isSuccessful())) {
                     Log.e(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is not successful");
 
+                    usersAdapter.changeDataSet(null, UsersAdapter.FAILURE_VIEW);
+                    usersAdapter.notifyDataSetChanged();
 
                 } else {
                     Log.v(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful");
@@ -82,11 +85,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Response<UserBody> userBodyResponse = (Response<UserBody>) data;
                     userArrayList = userBodyResponse.body().getData().getUsers();
                     Gson gson = new Gson();
-                    Log.v(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + gson.toJson(userArrayList));
+                    Log.d(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + gson.toJson(userArrayList));
                     hasMore = userBodyResponse.body().getData().getHasMore();
 
-                    usersAdapter = new UsersAdapter(this, userArrayList);
-                    recyclerView.setAdapter(usersAdapter);
+                    usersAdapter.changeDataSet(userArrayList, UsersAdapter.USER_VIEW);
+                    usersAdapter.notifyDataSetChanged();
                 }
 
                 break;

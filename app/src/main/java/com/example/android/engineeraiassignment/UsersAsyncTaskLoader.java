@@ -47,6 +47,12 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
             e.printStackTrace();
         }
 
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         return userBodyResponse;
     }
 }

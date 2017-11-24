@@ -27,13 +27,21 @@ import butterknife.ButterKnife;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> {
 
+    public static final int USER_VIEW = 0;
+    public static final int EMPTY_VIEW = 1;
+    public static final int LOADING_VIEW = 2;
+    public static final int FAILURE_VIEW = 3;
     private static final String LOG_TAG = UsersAdapter.class.getSimpleName();
-    private static final int USER_VIEW = 0;
-    private static final int EMPTY_VIEW = 1;
-    private static final int LOADING_VIEW = 2;
     private static final int FLEXBOX_LAYOUT_ID = 100;
+    private int CURRENT_VIEW;
     private Context context;
     private ArrayList<User> userArrayList;
+
+    public UsersAdapter(Context context, int CURRENT_VIEW) {
+
+        this.context = context;
+        this.CURRENT_VIEW = CURRENT_VIEW;
+    }
 
     public UsersAdapter(Context context, ArrayList<User> userArrayList) {
 
@@ -41,21 +49,34 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         this.userArrayList = userArrayList;
     }
 
+    public void changeDataSet(ArrayList<User> userArrayList, int CURRENT_VIEW) {
+
+        this.userArrayList = userArrayList;
+        this.CURRENT_VIEW = CURRENT_VIEW;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View itemView;
 
         switch (viewType) {
 
             case EMPTY_VIEW:
-                return null;
+            case FAILURE_VIEW:
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.empty_view_layout, parent, false);
+                return new EmptyViewHolder(itemView);
 
             case USER_VIEW:
-                View itemView = LayoutInflater.from(parent.getContext()).
-                        inflate(R.layout.user_item, parent, false);
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.user_item, parent, false);
                 return new UserViewHolder(itemView);
 
             case LOADING_VIEW:
-                return null;
+                itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.loading_layout, parent, false);
+                return new ViewHolder(itemView);
 
             default:
                 return null;
@@ -66,9 +87,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         switch (getItemViewType(position)) {
-
-            case EMPTY_VIEW:
-                break;
 
             case USER_VIEW:
                 UserViewHolder userViewHolder = (UserViewHolder) holder;
@@ -139,7 +157,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             case LOADING_VIEW:
                 break;
 
-            default:
+            case EMPTY_VIEW:
+                EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
+                emptyViewHolder.textViewMessage.setText(R.string.empty_message);
+                break;
+
+            case FAILURE_VIEW:
+                emptyViewHolder = (EmptyViewHolder) holder;
+                emptyViewHolder.textViewMessage.setText(R.string.failure_message);
                 break;
         }
     }
@@ -147,13 +172,27 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
 
-        if (userArrayList == null || userArrayList.size() == 0)
+        if (CURRENT_VIEW == LOADING_VIEW || CURRENT_VIEW == FAILURE_VIEW)
+            return CURRENT_VIEW;
+
+        else if (userArrayList == null || userArrayList.size() == 0)
             return EMPTY_VIEW;
+
         else if (position < userArrayList.size())
             return USER_VIEW;
+
         else if (position == userArrayList.size())
             return LOADING_VIEW;
+
         else throw new UnsupportedOperationException("Unknown position = " + position);
+
+//        if (userArrayList == null || userArrayList.size() == 0)
+//            return EMPTY_VIEW;
+//        else if (position < userArrayList.size())
+//            return USER_VIEW;
+//        else if (position == userArrayList.size())
+//            return LOADING_VIEW;
+//        else throw new UnsupportedOperationException("Unknown position = " + position);
     }
 
     @Override
@@ -182,6 +221,17 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         TextView textView;
 
         public UserViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+    }
+
+    public class EmptyViewHolder extends ViewHolder {
+
+        @BindView(R.id.textViewMessage)
+        TextView textViewMessage;
+
+        public EmptyViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
