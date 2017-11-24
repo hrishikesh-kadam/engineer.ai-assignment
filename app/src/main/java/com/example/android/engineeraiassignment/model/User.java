@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class User implements Parcelable {
 
@@ -34,7 +33,7 @@ public class User implements Parcelable {
 
     @SerializedName("items")
     @Expose
-    private List<String> items = new ArrayList<String>();
+    private ArrayList<String> items = new ArrayList<String>();
 
     protected User(Parcel in) {
         this.name = ((String) in.readValue((String.class.getClassLoader())));
@@ -63,7 +62,7 @@ public class User implements Parcelable {
         return image;
     }
 
-    public List<String> getItems() {
+    public ArrayList<String> getItems() {
         return items;
     }
 

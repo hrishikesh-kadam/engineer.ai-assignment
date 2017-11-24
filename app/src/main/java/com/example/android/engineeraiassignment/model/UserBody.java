@@ -61,7 +61,9 @@ public class UserBody implements Parcelable {
     }
 
     public Data getData() {
-        return data;
+
+        if (data == null) return new Data();
+        else return data;
     }
 
     @Override

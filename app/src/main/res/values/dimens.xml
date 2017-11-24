@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="imageViewMargin">16dp</dimen>
+    <dimen name="userImageViewDimens">50dp</dimen>
+    <dimen name="userImageViewRadius">25dp</dimen>
 </resources>

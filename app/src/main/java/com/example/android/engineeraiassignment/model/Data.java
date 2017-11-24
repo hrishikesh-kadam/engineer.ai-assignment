@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Data implements Parcelable {
 
@@ -26,7 +25,7 @@ public class Data implements Parcelable {
 
     @SerializedName("users")
     @Expose
-    private List<User> users = new ArrayList<User>();
+    private ArrayList<User> users = new ArrayList<User>();
 
     @SerializedName("has_more")
     @Expose
@@ -49,8 +48,10 @@ public class Data implements Parcelable {
         return 0;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public ArrayList<User> getUsers() {
+
+        if (users == null) return new ArrayList<>();
+        else return users;
     }
 
     public Boolean getHasMore() {
