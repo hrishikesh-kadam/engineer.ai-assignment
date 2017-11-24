@@ -12,6 +12,7 @@ import com.example.android.engineeraiassignment.model.User;
 import com.example.android.engineeraiassignment.model.UserBody;
 import com.example.android.engineeraiassignment.rest.MockService;
 import com.example.android.engineeraiassignment.rest.RetrofitConfiguration;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     @SuppressWarnings({"unchecked"})
                     Response<UserBody> userBodyResponse = (Response<UserBody>) data;
                     userArrayList = userBodyResponse.body().getData().getUsers();
+                    Gson gson = new Gson();
+                    Log.v(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + gson.toJson(userArrayList));
                     hasMore = userBodyResponse.body().getData().getHasMore();
 
                     usersAdapter = new UsersAdapter(this, userArrayList);

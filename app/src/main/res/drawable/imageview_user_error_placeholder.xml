@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/imageview_error_placeholder"/>
+
+    <size
+        android:width="@dimen/userImageViewDimens"
+        android:height="@dimen/userImageViewDimens" />
+
+    <corners android:radius="@dimen/userImageViewRadius"/>
+
+</shape>
