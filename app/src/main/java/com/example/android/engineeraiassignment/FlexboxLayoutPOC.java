@@ -73,18 +73,18 @@ public class FlexboxLayoutPOC extends AppCompatActivity {
         return flexboxLayout;
     }
 
-    public static ImageView getImageViewItem(Context context, int type) {
+    public static ImageView getImageViewItem(Context context, int TYPE) {
 
         ImageView imageView = new ImageView(context);
 
         FlexboxLayout.LayoutParams layoutParams = null;
 
-        if (type == ODD) {
+        if (TYPE == ODD) {
 
             layoutParams = new FlexboxLayout.LayoutParams(new ViewGroup.LayoutParams(
                     MainApplication.imageViewOddDimens, MainApplication.imageViewOddDimens));
 
-        } else if (type == EVEN) {
+        } else if (TYPE == EVEN) {
 
             layoutParams = new FlexboxLayout.LayoutParams(new ViewGroup.LayoutParams(
                     MainApplication.imageViewEvenDimens, MainApplication.imageViewEvenDimens));

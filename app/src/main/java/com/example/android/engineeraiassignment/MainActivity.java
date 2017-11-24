@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.android.engineeraiassignment.model.User;
@@ -13,6 +15,8 @@ import com.example.android.engineeraiassignment.rest.RetrofitConfiguration;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -23,11 +27,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private MockService mockService;
     private ArrayList<User> userArrayList;
     private boolean hasMore = true;
+    private UsersAdapter usersAdapter;
+
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(LOG_TAG, "-> onCreate");
+
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Retrofit retrofit = RetrofitConfiguration.getRetrofit();
         mockService = retrofit.create(MockService.class);
@@ -68,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Response<UserBody> userBodyResponse = (Response<UserBody>) data;
                     userArrayList = userBodyResponse.body().getData().getUsers();
                     hasMore = userBodyResponse.body().getData().getHasMore();
+
+                    usersAdapter = new UsersAdapter(this, userArrayList);
+                    recyclerView.setAdapter(usersAdapter);
                 }
 
                 break;
