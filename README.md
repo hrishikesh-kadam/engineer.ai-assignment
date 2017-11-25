@@ -22,8 +22,8 @@ Engineer.ai aka SqauredSD assignment for Udacity's Propel 17th November 2017 Ban
 To optimise more pagination configuration edit following constants in UserAdapter.java -
 
 ```java
-    public static final int LOAD_MORE_OFFSET = 5;
-    public static final int LIMIT = 10;
+public static final int LOAD_MORE_OFFSET = 5;
+public static final int LIMIT = 10;
 ```
 
 LOAD_MORE_OFFSET is the number of items left before already loaded userArrayList to hit loadMore callback.
