@@ -32,12 +32,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public static final int LOADING_VIEW = 2;
     public static final int LOAD_MORE_VIEW = 3;
     public static final int FAILURE_VIEW = 4;
+
     public static final int LOAD_MORE_OFFSET = 5;
     public static final int LIMIT = 10;
     private static final String LOG_TAG = UsersAdapter.class.getSimpleName();
     private static final int FLEXBOX_LAYOUT_ID = 100;
     private int offset = 0;
-
     private int CURRENT_VIEW;
     private Context context;
     private ArrayList<User> userArrayList;

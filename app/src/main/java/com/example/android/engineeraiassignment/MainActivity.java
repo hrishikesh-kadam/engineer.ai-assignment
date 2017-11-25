@@ -80,20 +80,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 Bundle bundle = (Bundle) data;
                 boolean isSuccessful = bundle.getBoolean("isSuccessful");
-                ArrayList<User> currentUserArrayList = bundle.getParcelableArrayList("currentUserArrayList");
+                userArrayList = bundle.getParcelableArrayList("currentUserArrayList");
                 hasMore = bundle.getBoolean("hasMore");
 
                 if (!isSuccessful) {
                     Log.e(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is not successful");
 
-                    usersAdapter.changeDataSet(UsersAdapter.FAILURE_VIEW, null, false);
+                    usersAdapter.changeDataSet(UsersAdapter.FAILURE_VIEW, userArrayList, hasMore);
                     usersAdapter.notifyDataSetChanged();
 
                 } else {
-                    Log.v(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful");
-
-                    userArrayList = new ArrayList<>(currentUserArrayList);
-
                     Log.d(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + userArrayList.size());
 
                     usersAdapter.changeDataSet(UsersAdapter.USER_VIEW, userArrayList, hasMore);

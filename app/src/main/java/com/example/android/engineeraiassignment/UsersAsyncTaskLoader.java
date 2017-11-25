@@ -25,15 +25,17 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
     private static final String LOG_TAG = UsersAsyncTaskLoader.class.getSimpleName();
     private MockService mockService;
     private int offset;
-    private ArrayList<User> previousUserArrayList = new ArrayList<>();
+    private ArrayList<User> previousUserArrayList;
     private boolean isLoadDelivered;
 
     public UsersAsyncTaskLoader(Context context, MockService mockService, int offset, ArrayList<User> userArrayList) {
         super(context);
+
         this.mockService = mockService;
         this.offset = offset;
+
         if (userArrayList != null)
-            previousUserArrayList.addAll(userArrayList);
+            previousUserArrayList = new ArrayList<>(userArrayList);
     }
 
     @Override
@@ -53,14 +55,14 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
         Response<UserBody> userBodyResponse = null;
 
         try {
-            userBodyResponse = userBodyCall.execute();
-        } catch (IOException e) {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
+            userBodyResponse = userBodyCall.execute();
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -69,6 +71,8 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
         if (userBodyResponse == null) {
 
             bundle.putBoolean("isSuccessful", false);
+            bundle.putParcelableArrayList("currentUserArrayList", previousUserArrayList);
+            bundle.putBoolean("hasMore", true);
 
         } else {
 
@@ -82,7 +86,10 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
                 bundle.putParcelableArrayList("currentUserArrayList", previousUserArrayList);
             }
 
-            bundle.putBoolean("hasMore", userBodyResponse.body().getData().getHasMore());
+            if (userBodyResponse.isSuccessful())
+                bundle.putBoolean("hasMore", userBodyResponse.body().getData().getHasMore());
+            else
+                bundle.putBoolean("hasMore", true);
         }
 
         return bundle;
