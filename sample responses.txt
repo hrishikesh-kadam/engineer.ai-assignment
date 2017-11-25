@@ -1,0 +1,102 @@
+http://sd2-hiring.herokuapp.com/api/users?offset=0&limit=10
+
+{
+    "status": true,
+    "message": null,
+    "data": {
+        "users": [
+            {
+                "name": "User-1",
+                "image": "http://loremflickr.com/300/300?random=1",
+                "items": [
+                    "http://loremflickr.com/800/800?random=34",
+                    "http://loremflickr.com/800/800?random=12",
+                    "http://loremflickr.com/800/800?random=30",
+                    "http://loremflickr.com/800/800?random=17",
+                    "http://loremflickr.com/800/800?random=48"
+                ]
+            },
+            {
+                "name": "User-2",
+                "image": "http://loremflickr.com/300/300?random=2",
+                "items": [
+                    "http://loremflickr.com/800/800?random=2",
+                    "http://loremflickr.com/800/800?random=50",
+                    "http://loremflickr.com/800/800?random=20",
+                    "http://loremflickr.com/800/800?random=4"
+                ]
+            },
+            {
+                "name": "User-3",
+                "image": "http://loremflickr.com/300/300?random=3",
+                "items": [
+                    "http://loremflickr.com/800/800?random=41",
+                    "http://loremflickr.com/800/800?random=19",
+                    "http://loremflickr.com/800/800?random=13",
+                    "http://loremflickr.com/800/800?random=37"
+                ]
+            },
+            {
+                "name": "User-4",
+                "image": "http://loremflickr.com/300/300?random=4",
+                "items": [
+                    "http://loremflickr.com/800/800?random=30",
+                    "http://loremflickr.com/800/800?random=33"
+                ]
+            },
+            {
+                "name": "User-5",
+                "image": "http://loremflickr.com/300/300?random=5",
+                "items": [
+                    "http://loremflickr.com/800/800?random=28",
+                    "http://loremflickr.com/800/800?random=24",
+                    "http://loremflickr.com/800/800?random=49"
+                ]
+            },
+            {
+                "name": "User-6",
+                "image": "http://loremflickr.com/300/300?random=6",
+                "items": [
+                    "http://loremflickr.com/800/800?random=8"
+                ]
+            },
+            {
+                "name": "User-7",
+                "image": "http://loremflickr.com/300/300?random=7",
+                "items": [
+                    "http://loremflickr.com/800/800?random=33",
+                    "http://loremflickr.com/800/800?random=5",
+                    "http://loremflickr.com/800/800?random=41",
+                    "http://loremflickr.com/800/800?random=37"
+                ]
+            },
+            {
+                "name": "User-8",
+                "image": "http://loremflickr.com/300/300?random=8",
+                "items": [
+                    "http://loremflickr.com/800/800?random=3",
+                    "http://loremflickr.com/800/800?random=8",
+                    "http://loremflickr.com/800/800?random=20",
+                    "http://loremflickr.com/800/800?random=24"
+                ]
+            },
+            {
+                "name": "User-9",
+                "image": "http://loremflickr.com/300/300?random=9",
+                "items": [
+                    "http://loremflickr.com/800/800?random=19",
+                    "http://loremflickr.com/800/800?random=39"
+                ]
+            },
+            {
+                "name": "User-10",
+                "image": "http://loremflickr.com/300/300?random=10",
+                "items": [
+                    "http://loremflickr.com/800/800?random=28",
+                    "http://loremflickr.com/800/800?random=10"
+                ]
+            }
+        ],
+        "has_more": true
+    }
+}
