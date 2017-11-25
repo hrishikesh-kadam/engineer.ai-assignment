@@ -43,6 +43,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     private ArrayList<User> userArrayList;
     private boolean hasMore;
     private OnLoadMoreListener onLoadMoreListener;
+    private RecyclerView recyclerView;
 
     public UsersAdapter(Context context, int CURRENT_VIEW) {
 
@@ -179,8 +180,25 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
             case FAILURE_VIEW:
                 emptyViewHolder = (EmptyViewHolder) holder;
+                emptyViewHolder.textViewMessage.setVisibility(View.VISIBLE);
                 emptyViewHolder.textViewMessage.setText(R.string.failure_message);
                 emptyViewHolder.imageViewRefresh.setVisibility(View.VISIBLE);
+                emptyViewHolder.loadingLayout.setVisibility(View.GONE);
+
+                recyclerView.smoothScrollToPosition(position);
+
+                emptyViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(LOG_TAG, "-> onClickRefresh");
+
+                        view.findViewById(R.id.loadingLayout).setVisibility(View.VISIBLE);
+                        view.findViewById(R.id.textViewMessage).setVisibility(View.GONE);
+                        view.findViewById(R.id.imageViewRefresh).setVisibility(View.GONE);
+
+                        onLoadMoreListener.onLoadMore();
+                    }
+                });
                 break;
         }
     }
@@ -220,6 +238,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             return userArrayList.size();
     }
 
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
+    }
+
     public interface OnLoadMoreListener {
         void onLoadMore();
     }
@@ -252,6 +276,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         TextView textViewMessage;
         @BindView(R.id.imageViewRefresh)
         ImageView imageViewRefresh;
+        @BindView(R.id.loadingLayout)
+        View loadingLayout;
 
         public EmptyViewHolder(View itemView) {
             super(itemView);

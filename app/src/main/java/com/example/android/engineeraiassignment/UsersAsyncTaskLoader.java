@@ -54,11 +54,11 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
         Call<UserBody> userBodyCall = mockService.getUsers(offset, UsersAdapter.LIMIT);
         Response<UserBody> userBodyResponse = null;
 
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(8000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         try {
             userBodyResponse = userBodyCall.execute();
