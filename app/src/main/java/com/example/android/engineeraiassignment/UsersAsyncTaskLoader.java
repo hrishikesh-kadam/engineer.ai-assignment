@@ -1,13 +1,17 @@
 package com.example.android.engineeraiassignment;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.example.android.engineeraiassignment.model.User;
 import com.example.android.engineeraiassignment.model.UserBody;
 import com.example.android.engineeraiassignment.rest.MockService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -20,25 +24,32 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
 
     private static final String LOG_TAG = UsersAsyncTaskLoader.class.getSimpleName();
     private MockService mockService;
+    private int offset;
+    private ArrayList<User> previousUserArrayList = new ArrayList<>();
+    private boolean isLoadDelivered;
 
-    public UsersAsyncTaskLoader(Context context, MockService mockService) {
+    public UsersAsyncTaskLoader(Context context, MockService mockService, int offset, ArrayList<User> userArrayList) {
         super(context);
         this.mockService = mockService;
+        this.offset = offset;
+        if (userArrayList != null)
+            previousUserArrayList.addAll(userArrayList);
     }
 
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
-        Log.d(LOG_TAG, "-> onStartLoading -> check if this is required");
+        Log.v(LOG_TAG, "-> onStartLoading -> isLoadDelivered = " + isLoadDelivered);
 
-        forceLoad();
+        if (!isLoadDelivered)
+            forceLoad();
     }
 
     @Override
     public Object loadInBackground() {
         Log.v(LOG_TAG, "-> loadInBackground");
 
-        Call<UserBody> userBodyCall = mockService.getUsers(0, 10);
+        Call<UserBody> userBodyCall = mockService.getUsers(offset, UsersAdapter.LIMIT);
         Response<UserBody> userBodyResponse = null;
 
         try {
@@ -53,6 +64,35 @@ public class UsersAsyncTaskLoader extends AsyncTaskLoader {
             e.printStackTrace();
         }
 
-        return userBodyResponse;
+        Bundle bundle = new Bundle();
+
+        if (userBodyResponse == null) {
+
+            bundle.putBoolean("isSuccessful", false);
+
+        } else {
+
+            bundle.putBoolean("isSuccessful", userBodyResponse.isSuccessful());
+
+            if (previousUserArrayList == null || previousUserArrayList.size() == 0)
+                bundle.putParcelableArrayList("currentUserArrayList", userBodyResponse.body().getData().getUsers());
+
+            else {
+                previousUserArrayList.addAll(userBodyResponse.body().getData().getUsers());
+                bundle.putParcelableArrayList("currentUserArrayList", previousUserArrayList);
+            }
+
+            bundle.putBoolean("hasMore", userBodyResponse.body().getData().getHasMore());
+        }
+
+        return bundle;
+    }
+
+    @Override
+    public void deliverResult(@Nullable Object data) {
+        Log.v(LOG_TAG, "-> deliverResult");
+
+        isLoadDelivered = true;
+        super.deliverResult(data);
     }
 }

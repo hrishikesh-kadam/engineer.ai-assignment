@@ -9,27 +9,27 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
 import com.example.android.engineeraiassignment.model.User;
-import com.example.android.engineeraiassignment.model.UserBody;
 import com.example.android.engineeraiassignment.rest.MockService;
 import com.example.android.engineeraiassignment.rest.RetrofitConfiguration;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks,
+        UsersAdapter.OnLoadMoreListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int GET_USERS_CALL = 1;
+
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
+
     private MockService mockService;
     private ArrayList<User> userArrayList;
-    private boolean hasMore = true;
+    private boolean hasMore;
     private UsersAdapter usersAdapter;
 
     @Override
@@ -40,14 +40,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        usersAdapter = new UsersAdapter(this, UsersAdapter.LOADING_VIEW);
-        recyclerView.setAdapter(usersAdapter);
+        initRecyclerView();
 
         Retrofit retrofit = RetrofitConfiguration.getRetrofit();
         mockService = retrofit.create(MockService.class);
 
         getSupportLoaderManager().initLoader(GET_USERS_CALL, null, this);
+    }
+
+    private void initRecyclerView() {
+        Log.v(LOG_TAG, "-> initRecyclerView");
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        usersAdapter = new UsersAdapter(this, UsersAdapter.LOADING_VIEW);
+        usersAdapter.setOnLoadMoreListener(this);
+        recyclerView.setAdapter(usersAdapter);
     }
 
     @Override
@@ -57,12 +64,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             case GET_USERS_CALL:
                 Log.v(LOG_TAG, "-> onCreateLoader -> GET_USERS_CALL");
-                return new UsersAsyncTaskLoader(this, mockService);
+                return new UsersAsyncTaskLoader(this, mockService, usersAdapter.getOffset(), userArrayList);
 
             default:
                 throw new UnsupportedOperationException("Unknown id = " + id);
         }
-
     }
 
     @Override
@@ -72,23 +78,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             case GET_USERS_CALL:
 
-                if (data == null || !(((Response<UserBody>) data).isSuccessful())) {
+                Bundle bundle = (Bundle) data;
+                boolean isSuccessful = bundle.getBoolean("isSuccessful");
+                ArrayList<User> currentUserArrayList = bundle.getParcelableArrayList("currentUserArrayList");
+                hasMore = bundle.getBoolean("hasMore");
+
+                if (!isSuccessful) {
                     Log.e(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is not successful");
 
-                    usersAdapter.changeDataSet(null, UsersAdapter.FAILURE_VIEW);
+                    usersAdapter.changeDataSet(UsersAdapter.FAILURE_VIEW, null, false);
                     usersAdapter.notifyDataSetChanged();
 
                 } else {
                     Log.v(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful");
 
-                    @SuppressWarnings({"unchecked"})
-                    Response<UserBody> userBodyResponse = (Response<UserBody>) data;
-                    userArrayList = userBodyResponse.body().getData().getUsers();
-                    Gson gson = new Gson();
-                    Log.d(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + gson.toJson(userArrayList));
-                    hasMore = userBodyResponse.body().getData().getHasMore();
+                    userArrayList = new ArrayList<>(currentUserArrayList);
 
-                    usersAdapter.changeDataSet(userArrayList, UsersAdapter.USER_VIEW);
+                    Log.d(LOG_TAG, "-> onLoadFinished -> GET_USERS_CALL -> is successful -> " + userArrayList.size());
+
+                    usersAdapter.changeDataSet(UsersAdapter.USER_VIEW, userArrayList, hasMore);
                     usersAdapter.notifyDataSetChanged();
                 }
 
@@ -99,5 +107,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader loader) {
         Log.v(LOG_TAG, "-> onLoaderReset");
+    }
+
+    @Override
+    public void onLoadMore() {
+        Log.v(LOG_TAG, "-> onLoadMore");
+
+        getSupportLoaderManager().restartLoader(GET_USERS_CALL, null, this);
     }
 }

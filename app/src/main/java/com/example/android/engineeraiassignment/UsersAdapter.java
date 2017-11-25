@@ -30,12 +30,19 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     public static final int USER_VIEW = 0;
     public static final int EMPTY_VIEW = 1;
     public static final int LOADING_VIEW = 2;
-    public static final int FAILURE_VIEW = 3;
+    public static final int LOAD_MORE_VIEW = 3;
+    public static final int FAILURE_VIEW = 4;
+    public static final int LOAD_MORE_OFFSET = 5;
+    public static final int LIMIT = 10;
     private static final String LOG_TAG = UsersAdapter.class.getSimpleName();
     private static final int FLEXBOX_LAYOUT_ID = 100;
+    private int offset = 0;
+
     private int CURRENT_VIEW;
     private Context context;
     private ArrayList<User> userArrayList;
+    private boolean hasMore;
+    private OnLoadMoreListener onLoadMoreListener;
 
     public UsersAdapter(Context context, int CURRENT_VIEW) {
 
@@ -43,16 +50,19 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         this.CURRENT_VIEW = CURRENT_VIEW;
     }
 
-    public UsersAdapter(Context context, ArrayList<User> userArrayList) {
-
-        this.context = context;
-        this.userArrayList = userArrayList;
+    public int getOffset() {
+        return offset;
     }
 
-    public void changeDataSet(ArrayList<User> userArrayList, int CURRENT_VIEW) {
+    public void changeDataSet(int CURRENT_VIEW, ArrayList<User> userArrayList, boolean hasMore) {
 
-        this.userArrayList = userArrayList;
         this.CURRENT_VIEW = CURRENT_VIEW;
+        this.userArrayList = userArrayList;
+        this.hasMore = hasMore;
+    }
+
+    public void setOnLoadMoreListener(OnLoadMoreListener onLoadMoreListener) {
+        this.onLoadMoreListener = onLoadMoreListener;
     }
 
     @Override
@@ -74,6 +84,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
                 return new UserViewHolder(itemView);
 
             case LOADING_VIEW:
+            case LOAD_MORE_VIEW:
                 itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.loading_layout, parent, false);
                 return new ViewHolder(itemView);
@@ -89,10 +100,17 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         switch (getItemViewType(position)) {
 
             case USER_VIEW:
+                Log.v(LOG_TAG, "-> onBindViewHolder -> position = " + position);
+
+                if (userArrayList.size() - 1 - position == LOAD_MORE_OFFSET && hasMore) {
+
+                    Log.d(LOG_TAG, "-> onBindViewHolder -> load more at position = " + position);
+                    offset = userArrayList.size();
+                    onLoadMoreListener.onLoadMore();
+                }
+
                 UserViewHolder userViewHolder = (UserViewHolder) holder;
                 User user = userArrayList.get(position);
-
-                Log.d(LOG_TAG, "-> onBindViewHolder -> position = " + position + ", user name: " + user.getName() + ", no of items = " + user.getItems().size());
 
                 String imageUrl = user.getImage().replace("http:", "https:");
                 Picasso.with(context)
@@ -154,9 +172,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
                 break;
 
-            case LOADING_VIEW:
-                break;
-
             case EMPTY_VIEW:
                 EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
                 emptyViewHolder.textViewMessage.setText(R.string.empty_message);
@@ -182,17 +197,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             return USER_VIEW;
 
         else if (position == userArrayList.size())
-            return LOADING_VIEW;
+            return LOAD_MORE_VIEW;
 
         else throw new UnsupportedOperationException("Unknown position = " + position);
-
-//        if (userArrayList == null || userArrayList.size() == 0)
-//            return EMPTY_VIEW;
-//        else if (position < userArrayList.size())
-//            return USER_VIEW;
-//        else if (position == userArrayList.size())
-//            return LOADING_VIEW;
-//        else throw new UnsupportedOperationException("Unknown position = " + position);
     }
 
     @Override
@@ -200,8 +207,14 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
         if (userArrayList == null || userArrayList.size() == 0)
             return 1;
+        else if (hasMore)
+            return userArrayList.size() + 1;
         else
             return userArrayList.size();
+    }
+
+    public interface OnLoadMoreListener {
+        void onLoadMore();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
