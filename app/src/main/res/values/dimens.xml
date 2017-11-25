@@ -3,4 +3,6 @@
     <dimen name="imageViewMargin">16dp</dimen>
     <dimen name="userImageViewDimens">50dp</dimen>
     <dimen name="userImageViewRadius">25dp</dimen>
+
+    <dimen name="refresh_dimens">66dp</dimen>
 </resources>

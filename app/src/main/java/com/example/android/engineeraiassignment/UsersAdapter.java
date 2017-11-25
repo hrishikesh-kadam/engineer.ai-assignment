@@ -102,7 +102,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             case USER_VIEW:
                 Log.v(LOG_TAG, "-> onBindViewHolder -> position = " + position);
 
-                if (userArrayList.size() - 1 - position == LOAD_MORE_OFFSET && hasMore) {
+                if (userArrayList.size() - 1 - position == LOAD_MORE_OFFSET && hasMore && CURRENT_VIEW == USER_VIEW) {
 
                     Log.d(LOG_TAG, "-> onBindViewHolder -> load more at position = " + position);
                     offset = userArrayList.size();
@@ -180,6 +180,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
             case FAILURE_VIEW:
                 emptyViewHolder = (EmptyViewHolder) holder;
                 emptyViewHolder.textViewMessage.setText(R.string.failure_message);
+                emptyViewHolder.imageViewRefresh.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -187,8 +188,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
     @Override
     public int getItemViewType(int position) {
 
-        if (CURRENT_VIEW == LOADING_VIEW || CURRENT_VIEW == FAILURE_VIEW)
-            return CURRENT_VIEW;
+        if (CURRENT_VIEW == LOADING_VIEW)
+            return LOADING_VIEW;
+
+        else if (CURRENT_VIEW == FAILURE_VIEW && (userArrayList == null || userArrayList.size() == 0))
+            return FAILURE_VIEW;
 
         else if (userArrayList == null || userArrayList.size() == 0)
             return EMPTY_VIEW;
@@ -196,8 +200,11 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
         else if (position < userArrayList.size())
             return USER_VIEW;
 
-        else if (position == userArrayList.size())
+        else if (position == userArrayList.size() && CURRENT_VIEW == USER_VIEW)
             return LOAD_MORE_VIEW;
+
+        else if (position == userArrayList.size() && CURRENT_VIEW == FAILURE_VIEW)
+            return FAILURE_VIEW;
 
         else throw new UnsupportedOperationException("Unknown position = " + position);
     }
@@ -243,6 +250,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.ViewHolder> 
 
         @BindView(R.id.textViewMessage)
         TextView textViewMessage;
+        @BindView(R.id.imageViewRefresh)
+        ImageView imageViewRefresh;
 
         public EmptyViewHolder(View itemView) {
             super(itemView);
